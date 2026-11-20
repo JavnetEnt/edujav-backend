@@ -44,7 +44,8 @@ export class TimetableService {
     const generatedSlots: any[] = [];
 
     for (const cls of classrooms) {
-      const classSubjects = assignments.filter((a) => a.classRoomId === cls.id);
+   const classSubjects = assignments.filter((a: any) => a.classRoomId === cls.id);
+
       if (!classSubjects.length) continue;
 
       let subjectPointer = 0;

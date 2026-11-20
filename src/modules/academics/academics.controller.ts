@@ -1,10 +1,34 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  CanActivate,
+  Controller,
+  createParamDecorator,
+  Delete,
+  ExecutionContext,
+  Get,
+  Param,
+  Post,
+  Query,
+  SetMetadata,
+  Injectable,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Reflector } from '@nestjs/core';
 import { Role } from '@prisma/client';
-import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
-import { Roles } from '../../common/decorators/roles.decorator.js';
-import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { AcademicsService } from './academics.service.js';
+
+export interface JwtUserPayload {
+  sub: string;
+  tenantId: string;
+  role: Role;
+}
+
+export const CurrentUser = createParamDecorator(
+  (_data: unknown, context: ExecutionContext): JwtUserPayload =>
+    context.switchToHttp().getRequest<{ user: JwtUserPayload }>().user,
+);
+
 import {
   AssignTeacherDto,
   CreateClassRoomDto,
@@ -13,12 +37,34 @@ import {
   CreateTermDto,
   GenerateTimetableDto,
 } from './dto/academics.dto.js';
+import { TimetableService } from './timetable.service.js';
+
+const Roles = (...roles: Role[]) => SetMetadata('roles', roles);
+
+@Injectable()
+class RolesGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const roles = this.reflector.getAllAndOverride<Role[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (!roles?.length) return true;
+
+    const user = context.switchToHttp().getRequest<{ user?: JwtUserPayload }>().user;
+    return !!user && roles.includes(user.role);
+  }
+}
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('academics')
 export class AcademicsController {
-    timetableService: any;
-  constructor(private readonly academicsService: AcademicsService) {}
+  constructor(
+    private readonly academicsService: AcademicsService,
+    private readonly timetableService: TimetableService,
+  ) {}
+
 
   @Get('overview')
   getOverview(@CurrentUser() user: JwtUserPayload) {
