@@ -1,0 +1,350 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  SCHOOL_OWNER
+  ADMIN
+  BURSAR
+  TEACHER
+  PARENT
+  STUDENT
+}
+
+model Tenant {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  logoUrl       String?
+  primaryColor  String   @default("#1E40AF")
+  address       String?
+  phone         String?
+  email         String   @unique
+  caWeight      Int      @default(40)
+  examWeight    Int      @default(60)
+  paystackSubaccountCode String? // e.g., "ACCT_89x72k1"
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users         User[]
+  sessions      AcademicSession[]
+  classes       ClassRoom[]
+  subjects      Subject[]
+  gradingScales GradingScale[]
+  teacherAssignments TeacherAssignment[]
+  scores     Score[]
+  reportCards ReportCard[]
+  feeStructures       FeeStructure[]
+  studentInvoices     StudentInvoice[]
+  paymentTransactions PaymentTransaction[]
+  attendanceRecords AttendanceRecord[]
+  auditLogs         AuditLog[]
+  
+
+}
+
+model User {
+  id             String          @id @default(uuid())
+  tenantId       String?
+  tenant         Tenant?         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  email          String
+  passwordHash   String
+  firstName      String
+  lastName       String
+  phone          String?
+  role           Role
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  teacherAssignments TeacherAssignment[]
+
+  studentProfile StudentProfile?
+  parentLinks    ParentStudent[] @relation("ParentUser")
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+model AcademicSession {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name      String
+  isCurrent Boolean  @default(false)
+  terms     Term[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model Term {
+  id        String          @id @default(uuid())
+  tenantId  String
+  sessionId String
+  session   AcademicSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name      String
+  isCurrent Boolean         @default(false)
+  startDate DateTime?
+  endDate   DateTime?
+
+  @@index([tenantId, sessionId])
+  scores     Score[]
+  reportCards ReportCard[]
+  feeStructures       FeeStructure[]
+  studentInvoices     StudentInvoice[]
+  attendanceRecords AttendanceRecord[]
+}
+
+model ClassRoom {
+  id       String           @id @default(uuid())
+  tenantId String
+  tenant   Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name     String
+  arm      String?
+  students StudentProfile[]
+  formTeacherId      String?
+  teacherAssignments TeacherAssignment[]
+
+  @@unique([tenantId, name, arm])
+  @@index([tenantId])
+   scores     Score[]
+  reportCards ReportCard[]
+  feeStructures       FeeStructure[]
+  attendanceRecords AttendanceRecord[]
+}
+
+model Subject {
+  id       String  @id @default(uuid())
+  tenantId String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name     String
+  code     String?
+  teacherAssignments TeacherAssignment[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  scores     Score[]
+}
+
+model StudentProfile {
+  id              String          @id @default(uuid())
+  tenantId        String
+  userId          String          @unique
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  admissionNumber String
+  classRoomId     String?
+  classRoom       ClassRoom?      @relation(fields: [classRoomId], references: [id])
+  gender          String?
+  dateOfBirth     DateTime?
+  parents         ParentStudent[] @relation("StudentUser")
+
+  @@unique([tenantId, admissionNumber])
+  @@index([tenantId, classRoomId])
+  scores     Score[]
+  reportCards ReportCard[]
+  invoices     StudentInvoice[]
+  attendanceRecords AttendanceRecord[]
+}
+
+model ParentStudent {
+  id           String         @id @default(uuid())
+  tenantId     String
+  parentId     String
+  parent       User           @relation("ParentUser", fields: [parentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      StudentProfile @relation("StudentUser", fields: [studentId], references: [id], onDelete: Cascade)
+  relationship String         @default("Parent")
+
+  @@unique([parentId, studentId])
+  @@index([tenantId])
+}
+
+model GradingScale {
+  id       String @id @default(uuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  grade    String
+  minScore Float
+  maxScore Float
+  remark   String
+
+  @@index([tenantId])
+}
+
+model TeacherAssignment {
+  id          String    @id @default(uuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  teacherId   String
+  teacher     User      @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  classRoomId String
+  classRoom   ClassRoom @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  subjectId   String
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, teacherId, classRoomId, subjectId])
+  @@index([tenantId, teacherId])
+}
+
+model Score {
+  id          String         @id @default(uuid())
+  tenantId    String
+  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classRoomId String
+  classRoom   ClassRoom      @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  subjectId   String
+  subject     Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  termId      String
+  term        Term           @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  ca1         Float          @default(0) // e.g., First Test (20)
+  ca2         Float          @default(0) // e.g., Second Test / Assignment (20)
+  exam        Float          @default(0) // e.g., Term Exam (60)
+  total       Float          @default(0) // Auto-calculated: ca1 + ca2 + exam
+  grade       String?        // Auto-mapped from Tenant's GradingScale (e.g., "A")
+  remark      String?        // Auto-mapped (e.g., "Excellent")
+  recordedBy  String?        // Teacher userId for audit trail
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([tenantId, studentId, subjectId, termId])
+  @@index([tenantId, classRoomId, termId])
+}
+
+model ReportCard {
+  id               String         @id @default(uuid())
+  tenantId         String
+  tenant           Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  studentId        String
+  student          StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classRoomId      String
+  classRoom        ClassRoom      @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  termId           String
+  term             Term           @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  totalScore       Float
+  averageScore     Float
+  positionInClass  Int
+  totalStudents    Int
+  teacherComment   String?
+  principalComment String?
+  verificationCode String         @unique @default(uuid()) // Printed as QR code to prevent fake results!
+  isPublished      Boolean        @default(false)
+  generatedAt      DateTime       @default(now())
+
+  @@unique([tenantId, studentId, termId])
+  @@index([tenantId, classRoomId, termId])
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PARTIAL
+  PAID
+}
+
+enum PaymentMethod {
+  PAYSTACK
+  BANK_TRANSFER
+  CASH
+}
+
+model FeeStructure {
+  id          String    @id @default(uuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  classRoomId String
+  classRoom   ClassRoom @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  termId      String
+  term        Term      @relation(fields: [termId], references: [id], onDelete: Cascade)
+  title       String    // e.g., "Tuition Fee", "ICT & Lab Levy"
+  amount      Float     // Amount in Naira (or school currency)
+  isMandatory Boolean   @default(true)
+
+  @@index([tenantId, classRoomId, termId])
+}
+
+model StudentInvoice {
+  id            String               @id @default(uuid())
+  tenantId      String
+  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       StudentProfile       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  termId        String
+  term          Term                 @relation(fields: [termId], references: [id], onDelete: Cascade)
+  invoiceNumber String               @unique // e.g., "INV-2026-0001"
+  totalAmount   Float
+  amountPaid    Float                @default(0)
+  balance       Float
+  status        InvoiceStatus        @default(UNPAID)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  transactions  PaymentTransaction[]
+
+  @@unique([tenantId, studentId, termId])
+  @@index([tenantId, termId, status])
+}
+
+model PaymentTransaction {
+  id            String         @id @default(uuid())
+  tenantId      String
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoiceId     String
+  invoice       StudentInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  reference     String         @unique // Paystack ref or manual receipt ref
+  receiptNumber String         @unique // Official school receipt number
+  amount        Float
+  method        PaymentMethod
+  status        String         @default("SUCCESS") // PENDING, SUCCESS, FAILED
+  recordedBy    String?        // Bursar userId if recorded manually
+  paidAt        DateTime       @default(now())
+
+  @@index([tenantId, invoiceId])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+model AttendanceRecord {
+  id          String           @id @default(uuid())
+  tenantId    String
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classRoomId String
+  classRoom   ClassRoom        @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  termId      String
+  term        Term             @relation(fields: [termId], references: [id], onDelete: Cascade)
+  date        DateTime         @db.Date // e.g., 2026-11-19
+  status      AttendanceStatus
+  remark      String?
+  markedBy    String           // Teacher userId
+  createdAt   DateTime         @default(now())
+
+  @@unique([tenantId, studentId, date])
+  @@index([tenantId, classRoomId, date])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  actorId   String   // User who performed the action
+  action    String   // e.g., "SCORE_UPDATED", "INVOICE_GENERATED", "STUDENT_ABSENT_ALERT"
+  details   String
+  createdAt DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+}
