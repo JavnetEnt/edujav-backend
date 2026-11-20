@@ -72,4 +72,5 @@ export class ResultsController {
   ) {
     return this.resultsService.updateRemarks(user.tenantId, id, dto);
   }
+
 }

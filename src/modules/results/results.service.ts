@@ -24,21 +24,21 @@ export class ResultsService {
     dto: BulkRecordScoresDto,
   ) {
     // If TEACHER, verify they are actually assigned to this class & subject
-    if (recorderRole === Role.TEACHER) {
-      const assignment = await this.prisma.teacherAssignment.findFirst({
-        where: {
-          tenantId,
-          teacherId: recorderId,
-          classRoomId: dto.classRoomId,
-          subjectId: dto.subjectId,
-        },
-      });
-      if (!assignment) {
-        throw new ForbiddenException(
-          'You are not assigned to record scores for this subject and class',
-        );
-      }
+       // Strictly verify the user is the assigned teacher for this class & subject
+    const assignment = await this.prisma.teacherAssignment.findFirst({
+      where: {
+        tenantId,
+        teacherId: recorderId,
+        classRoomId: dto.classRoomId,
+        subjectId: dto.subjectId,
+      },
+    });
+    if (!assignment) {
+      throw new ForbiddenException(
+        'Access denied: Only the assigned subject teacher can record or modify scores',
+      );
     }
+
 
     const tenant = await this.prisma.tenant.findUniqueOrThrow({
       where: { id: tenantId },
