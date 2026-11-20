@@ -11,12 +11,8 @@ import {
   CreateSessionDto,
   CreateSubjectDto,
   CreateTermDto,
-<<<<<<< HEAD
-} from './dto/academics.dto.js';
-=======
   GenerateTimetableDto,
-} from './dto/academics.dto';
->>>>>>> ebd247a (Add AI CBT generator and smart 3-term timetable endpoints)
+} from './dto/academics.dto.js';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('academics')

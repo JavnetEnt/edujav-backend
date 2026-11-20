@@ -9,11 +9,14 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
-import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { CbtService } from './cbt.service';
-import { GenerateCbtDto, SubmitCbtDto } from './dto/cbt.dto';
+import {
+  CurrentUser,
+  JwtUserPayload,
+} from '../../common/decorators/current-user.decorator.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { CbtService } from './cbt.service.js';
+import { GenerateCbtDto, SubmitCbtDto } from './dto/cbt.dto.js';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('cbt')

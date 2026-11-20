@@ -1,10 +1,11 @@
 import {
-  BadRequestException,
+  BadGatewayException,
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service.js';
 
 @Injectable()
 export class CbtService {
@@ -40,6 +41,9 @@ export class CbtService {
 
     const count = Math.min(Math.max(dto.questionCount || 10, 5), 30);
     const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new ServiceUnavailableException('CBT question generation is not configured');
+    }
 
     const prompt = `You are a Nigerian school examiner preparing practice CBT questions for ${assignment.classRoom.name} students in ${assignment.subject.name}.
 Topics taught this term: ${dto.topicsCovered}.
@@ -56,10 +60,13 @@ Return ONLY a valid JSON array with no markdown or extra text, formatted strictl
 ]`;
 
     const response = await fetch(
-      `https://googleapis.com{apiKey}`,
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: { responseMimeType: 'application/json' },
@@ -67,11 +74,15 @@ Return ONLY a valid JSON array with no markdown or extra text, formatted strictl
       },
     );
 
+    if (!response.ok) {
+      throw new BadGatewayException('CBT question generation service returned an error');
+    }
+
     const result = await response.json();
     const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!rawText) {
-      throw new BadRequestException('Failed to generate CBT questions from AI service');
+      throw new BadGatewayException('Failed to generate CBT questions from AI service');
     }
 
     const parsedQuestions = JSON.parse(rawText);
