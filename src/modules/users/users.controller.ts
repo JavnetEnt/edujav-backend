@@ -16,11 +16,11 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Role } from '@prisma/client';
-import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { CreateStaffDto, EnrollStudentDto, UpdateUserDto } from './dto/users.dto';
-import { UsersService } from './users.service';
+import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { CreateStaffDto, EnrollStudentDto, UpdateUserDto } from './dto/users.dto.js';
+import { UsersService } from './users.service.js';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('users')

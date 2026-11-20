@@ -5,12 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Role, Score } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service.js';
 import {
   BulkRecordScoresDto,
   GenerateBroadsheetDto,
   UpdateRemarksDto,
-} from './dto/results.dto';
+} from './dto/results.dto.js';
 
 @Injectable()
 export class ResultsService {

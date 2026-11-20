@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
-import { AcademicsModule } from './modules/academics/academics.module';
-import { ResultsModule } from './modules/results/results.module';
-import { FinanceModule } from './modules/finance/finance.module';
-import { AttendanceModule } from './modules/attendance/attendance.module';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { PrismaModule } from './prisma/prisma.module.js';
+import { AuthModule } from './modules/auth/auth.module.js';
+import { UsersModule } from './modules/users/users.module.js';
+import { AcademicsModule } from './modules/academics/academics.module.js';
+import { ResultsModule } from './modules/results/results.module.js';
+import { FinanceModule } from './modules/finance/finance.module.js';
+import { AttendanceModule } from './modules/attendance/attendance.module.js';
 
 
 @Module({

@@ -10,15 +10,15 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
-import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { RolesGuard } from '../../common/guards/roles.guard';
+import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
 import {
   BulkRecordScoresDto,
   GenerateBroadsheetDto,
   UpdateRemarksDto,
-} from './dto/results.dto';
-import { ResultsService } from './results.service';
+} from './dto/results.dto.js';
+import { ResultsService } from './results.service.js';
 
 @Controller('results')
 export class ResultsController {

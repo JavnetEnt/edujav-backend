@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
-import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { AttendanceService } from './attendance.service';
-import { MarkClassAttendanceDto } from './dto/attendance.dto';
+import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { AttendanceService } from './attendance.service.js';
+import { MarkClassAttendanceDto } from './dto/attendance.dto.js';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('attendance')

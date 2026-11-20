@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator';
-import { AuthService } from './auth.service';
-import { ChangePasswordDto, LoginDto, OnboardSchoolDto } from './dto/auth.dto';
+import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
+import { AuthService } from './auth.service.js';
+import { ChangePasswordDto, LoginDto, OnboardSchoolDto } from './dto/auth.dto.js';
 
 @Controller('auth')
 export class AuthController {

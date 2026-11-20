@@ -1,17 +1,17 @@
 import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
-import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { AcademicsService } from './academics.service';
+import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
+import { AcademicsService } from './academics.service.js';
 import {
   AssignTeacherDto,
   CreateClassRoomDto,
   CreateSessionDto,
   CreateSubjectDto,
   CreateTermDto,
-} from './dto/academics.dto';
+} from './dto/academics.dto.js';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('academics')

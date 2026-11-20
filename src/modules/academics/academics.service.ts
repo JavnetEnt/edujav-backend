@@ -1,13 +1,13 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service.js';
 import {
   AssignTeacherDto,
   CreateClassRoomDto,
   CreateSessionDto,
   CreateSubjectDto,
   CreateTermDto,
-} from './dto/academics.dto';
+} from './dto/academics.dto.js';
 
 @Injectable()
 export class AcademicsService {

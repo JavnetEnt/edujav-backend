@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AttendanceStatus } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
-import { MarkClassAttendanceDto } from './dto/attendance.dto';
+import { PrismaService } from '../../prisma/prisma.service.js';
+import { MarkClassAttendanceDto } from './dto/attendance.dto.js';
 
 @Injectable()
 export class AttendanceService {

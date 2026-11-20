@@ -6,14 +6,14 @@ import {
 } from '@nestjs/common';
 import { InvoiceStatus, PaymentMethod, StudentInvoice } from '@prisma/client';
 import * as crypto from 'crypto';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service.js';
 import {
   ConfigureSchoolBankDto,
   CreateFeeItemDto,
   GenerateClassInvoicesDto,
   InitializePaystackPaymentDto,
   RecordManualPaymentDto,
-} from './dto/finance.dto';
+} from './dto/finance.dto.js';
 
 @Injectable()
 export class FinanceService {

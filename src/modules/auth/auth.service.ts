@@ -7,10 +7,10 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../../prisma/prisma.service';
-import { JwtUserPayload } from '../../common/decorators/current-user.decorator';
-import { getJwtAccessSecret } from '../../common/security/jwt-access-secret';
-import { ChangePasswordDto, LoginDto, OnboardSchoolDto } from './dto/auth.dto';
+import { PrismaService } from '../../prisma/prisma.service.js';
+import { JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
+import { getJwtAccessSecret } from '../../common/security/jwt-access-secret.js';
+import { ChangePasswordDto, LoginDto, OnboardSchoolDto } from './dto/auth.dto.js';
 
 @Injectable()
 export class AuthService {

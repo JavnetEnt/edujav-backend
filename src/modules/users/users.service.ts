@@ -7,8 +7,8 @@ import {
 import { Prisma, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { parse } from 'csv-parse/sync';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateStaffDto, EnrollStudentDto, UpdateUserDto } from './dto/users.dto';
+import { PrismaService } from '../../prisma/prisma.service.js';
+import { CreateStaffDto, EnrollStudentDto, UpdateUserDto } from './dto/users.dto.js';
 
 @Injectable()
 export class UsersService {

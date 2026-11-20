@@ -13,17 +13,17 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
 import type { Request } from 'express';
-import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { RolesGuard } from '../../common/guards/roles.guard';
+import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
+import { Roles } from '../../common/decorators/roles.decorator.js';
+import { RolesGuard } from '../../common/guards/roles.guard.js';
 import {
   ConfigureSchoolBankDto,
   CreateFeeItemDto,
   GenerateClassInvoicesDto,
   InitializePaystackPaymentDto,
   RecordManualPaymentDto,
-} from './dto/finance.dto';
-import { FinanceService } from './finance.service';
+} from './dto/finance.dto.js';
+import { FinanceService } from './finance.service.js';
 
 @Controller('finance')
 export class FinanceController {
