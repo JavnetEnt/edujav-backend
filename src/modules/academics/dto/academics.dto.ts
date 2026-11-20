@@ -1,5 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
-
+import { IsBoolean, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 export class CreateSessionDto {
   @IsString()
   @IsNotEmpty()
@@ -52,4 +51,22 @@ export class AssignTeacherDto {
 
   @IsUUID()
   subjectId: string;
+}
+
+
+export class GenerateTimetableDto {
+  @IsUUID()
+  termId: string;
+
+  @IsInt()
+  @IsIn([40, 45, 60], { message: 'Period duration must be 40, 45, or 60 minutes' })
+  periodDurationMinutes: 40 | 45 | 60;
+
+  @IsString()
+  @IsOptional()
+  startTime?: string; // e.g., "08:00"
+
+  @IsInt()
+  @IsOptional()
+  periodsPerDay?: number;
 }

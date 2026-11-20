@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from '@prisma/client';
 import { CurrentUser, JwtUserPayload } from '../../common/decorators/current-user.decorator.js';
@@ -11,11 +11,17 @@ import {
   CreateSessionDto,
   CreateSubjectDto,
   CreateTermDto,
+<<<<<<< HEAD
 } from './dto/academics.dto.js';
+=======
+  GenerateTimetableDto,
+} from './dto/academics.dto';
+>>>>>>> ebd247a (Add AI CBT generator and smart 3-term timetable endpoints)
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('academics')
 export class AcademicsController {
+    timetableService: any;
   constructor(private readonly academicsService: AcademicsService) {}
 
   @Get('overview')
@@ -85,6 +91,25 @@ export class AcademicsController {
   @Get('my-assignments')
   getMyAssignments(@CurrentUser() user: JwtUserPayload) {
     return this.academicsService.getTeacherAssignments(user.tenantId, user.sub);
+  }
+
+    @Roles(Role.SCHOOL_OWNER, Role.ADMIN)
+  @Post('timetable/generate')
+  generateTimetable(
+    @CurrentUser() user: JwtUserPayload,
+    @Body() dto: GenerateTimetableDto,
+  ) {
+    return this.timetableService.generateTermTimetable(user.tenantId, dto);
+  }
+
+  @Roles(Role.SCHOOL_OWNER, Role.ADMIN, Role.TEACHER, Role.PARENT, Role.STUDENT)
+  @Get('timetable')
+  getClassTimetable(
+    @CurrentUser() user: JwtUserPayload,
+    @Query('termId') termId: string,
+    @Query('classRoomId') classRoomId: string,
+  ) {
+    return this.timetableService.getClassTimetable(user.tenantId, termId, classRoomId);
   }
 
 }

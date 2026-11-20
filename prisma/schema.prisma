@@ -47,7 +47,9 @@ model Tenant {
   paymentTransactions PaymentTransaction[]
   attendanceRecords AttendanceRecord[]
   auditLogs         AuditLog[]
-  
+  cbtQuizzes       CbtQuiz[]
+  cbtAttempts      CbtAttempt[]
+  timetableSlots   TimetableSlot[]
 
 }
 
@@ -101,6 +103,8 @@ model Term {
   feeStructures       FeeStructure[]
   studentInvoices     StudentInvoice[]
   attendanceRecords AttendanceRecord[]
+  cbtQuizzes       CbtQuiz[]
+  timetableSlots   TimetableSlot[]
 }
 
 model ClassRoom {
@@ -119,6 +123,8 @@ model ClassRoom {
   reportCards ReportCard[]
   feeStructures       FeeStructure[]
   attendanceRecords AttendanceRecord[]
+  cbtQuizzes       CbtQuiz[]
+  timetableSlots   TimetableSlot[]
 }
 
 model Subject {
@@ -132,6 +138,8 @@ model Subject {
   @@unique([tenantId, name])
   @@index([tenantId])
   scores     Score[]
+  cbtQuizzes       CbtQuiz[]
+  timetableSlots   TimetableSlot[]
 }
 
 model StudentProfile {
@@ -152,6 +160,7 @@ model StudentProfile {
   reportCards ReportCard[]
   invoices     StudentInvoice[]
   attendanceRecords AttendanceRecord[]
+  cbtAttempts      CbtAttempt[]
 }
 
 model ParentStudent {
@@ -348,4 +357,70 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([tenantId, createdAt])
+}
+
+model CbtQuiz {
+  id              String       @id @default(uuid())
+  tenantId        String
+  tenant          Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  classRoomId     String
+  classRoom       ClassRoom    @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  subjectId       String
+  subject         Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  termId          String
+  term            Term         @relation(fields: [termId], references: [id], onDelete: Cascade)
+  teacherId       String
+  title           String       // e.g., "1st Term Mathematics Revision CBT"
+  topicsCovered   String       // Raw topics entered by teacher
+  durationMinutes Int          @default(20)
+  questions       Json         // Array of { question, options: string[], correctIndex: number, explanation: string }
+  isPublished     Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+
+  attempts        CbtAttempt[]
+
+  @@index([tenantId, classRoomId, termId])
+}
+
+model CbtAttempt {
+  id             String         @id @default(uuid())
+  tenantId       String
+  tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  quizId         String
+  quiz           CbtQuiz        @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  studentId      String
+  student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  score          Int
+  totalQuestions Int
+  percentage     Float
+  submittedAt    DateTime       @default(now())
+
+  @@index([tenantId, studentId])
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
+
+model TimetableSlot {
+  id          String    @id @default(uuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  termId      String
+  term        Term      @relation(fields: [termId], references: [id], onDelete: Cascade)
+  classRoomId String
+  classRoom   ClassRoom @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  subjectId   String?   // Null when slot is Assembly or Break
+  subject     Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  teacherId   String?   // Used to prevent double-booking a teacher at the same day & time!
+  day         DayOfWeek
+  startTime   String    // e.g., "08:00"
+  endTime     String    // e.g., "08:40"
+  label       String    // e.g., "Mathematics" or "Short Break"
+
+  @@index([tenantId, termId, classRoomId])
 }
