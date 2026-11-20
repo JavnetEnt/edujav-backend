@@ -184,4 +184,15 @@ export class AcademicsService {
     await this.prisma.subject.delete({ where: { id } });
     return { message: 'Subject deleted' };
   }
+
+    async getTeacherAssignments(tenantId: string, teacherId: string) {
+    return this.prisma.teacherAssignment.findMany({
+      where: { tenantId, teacherId },
+      include: {
+        classRoom: true,
+        subject: true,
+      },
+    });
+  }
+
 }

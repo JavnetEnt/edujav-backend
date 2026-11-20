@@ -80,4 +80,11 @@ export class AcademicsController {
   deleteSubject(@CurrentUser() user: JwtUserPayload, @Param('id') id: string) {
     return this.academicsService.deleteSubject(user.tenantId, id);
   }
+
+    @Roles(Role.TEACHER)
+  @Get('my-assignments')
+  getMyAssignments(@CurrentUser() user: JwtUserPayload) {
+    return this.academicsService.getTeacherAssignments(user.tenantId, user.sub);
+  }
+
 }
