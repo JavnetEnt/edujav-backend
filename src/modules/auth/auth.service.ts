@@ -9,6 +9,7 @@ import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtUserPayload } from '../../common/decorators/current-user.decorator';
+import { getJwtAccessSecret } from '../../common/security/jwt-access-secret';
 import { ChangePasswordDto, LoginDto, OnboardSchoolDto } from './dto/auth.dto';
 
 @Injectable()
@@ -128,7 +129,7 @@ export class AuthService {
 
   private async signTokens(payload: JwtUserPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_ACCESS_SECRET || 'super-secret-access-key',
+      secret: getJwtAccessSecret(),
       expiresIn: '1d',
     });
 

@@ -31,6 +31,18 @@
 $ npm install
 ```
 
+## Environment variables
+
+Configure these values in the deployment environment; do not commit them:
+
+- `DATABASE_URL`: Neon pooled connection string for application traffic.
+- `DIRECT_URL`: Neon direct connection string for Prisma migrations.
+- `JWT_ACCESS_SECRET`: a randomly generated secret used to sign access tokens.
+- `PAYSTACK_SECRET_KEY`: optional, required to process Paystack payments.
+
+Apply database migrations with `npx prisma migrate deploy` after setting both
+database URLs. The build script generates the Prisma client before compiling.
+
 ## Compile and run the project
 
 ```bash
