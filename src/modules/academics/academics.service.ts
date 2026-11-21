@@ -11,6 +11,7 @@ import {
 
 @Injectable()
 export class AcademicsService {
+    [x: string]: any;
   constructor(private readonly prisma: PrismaService) {}
 
   async createSession(tenantId: string, dto: CreateSessionDto) {
