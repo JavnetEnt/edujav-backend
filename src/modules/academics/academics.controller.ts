@@ -116,4 +116,15 @@ export class AcademicsController {
   ) {
     return this.timetableService.getClassTimetable(user.tenantId, termId, classRoomId);
   }
+
+    @Roles(Role.SCHOOL_OWNER, Role.ADMIN)
+  @Delete('timetable')
+  deleteTimetable(
+    @CurrentUser() user: JwtUserPayload,
+    @Query('termId') termId: string,
+    @Query('classRoomId') classRoomId?: string,
+  ) {
+    return this.timetableService.deleteTermTimetable(user.tenantId, termId, classRoomId);
+  }
+
 }

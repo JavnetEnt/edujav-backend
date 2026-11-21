@@ -135,4 +135,26 @@ export class TimetableService {
       orderBy: [{ day: 'asc' }, { startTime: 'asc' }],
     });
   }
+
+    async deleteTermTimetable(tenantId: string, termId: string, classRoomId?: string) {
+    if (!termId) {
+      throw new BadRequestException('termId is required');
+    }
+
+    const result = await this.prisma.timetableSlot.deleteMany({
+      where: {
+        tenantId,
+        termId,
+        ...(classRoomId ? { classRoomId } : {}),
+      },
+    });
+
+    return {
+      message: classRoomId
+        ? 'Class timetable deleted successfully'
+        : 'Term timetable deleted successfully',
+      deletedCount: result.count,
+    };
+  }
+
 }
