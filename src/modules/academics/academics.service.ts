@@ -14,7 +14,14 @@ export class AcademicsService {
     [x: string]: any;
   constructor(private readonly prisma: PrismaService) {}
 
-  async createSession(tenantId: string, dto: CreateSessionDto) {
+    async createSession(tenantId: string, dto: CreateSessionDto) {
+    const existing = await this.prisma.academicSession.findFirst({
+      where: { tenantId, name: dto.name.trim() },
+    });
+    if (existing) {
+      throw new ConflictException(`Academic session "${dto.name}" already exists`);
+    }
+
     if (dto.isCurrent) {
       await this.prisma.academicSession.updateMany({
         where: { tenantId },
@@ -25,11 +32,12 @@ export class AcademicsService {
     return this.prisma.academicSession.create({
       data: {
         tenantId,
-        name: dto.name,
+        name: dto.name.trim(),
         isCurrent: dto.isCurrent ?? false,
       },
     });
   }
+
 
   async createTerm(tenantId: string, dto: CreateTermDto) {
     const session = await this.prisma.academicSession.findFirst({

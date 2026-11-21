@@ -32,10 +32,11 @@ export class AcademicsController {
     private readonly timetableService: TimetableService,
   ) {}
 
-  @Get('overview')
+   @Get('overview')
   getOverview(@CurrentUser() user: JwtUserPayload) {
-    return this.academicsService.getSchoolOverview(user.tenantId);
+    return this.academicsService.getAcademicOverview(user.tenantId, user.sub, user.role);
   }
+
 
   @Roles(Role.TEACHER)
   @Get('my-assignments')
